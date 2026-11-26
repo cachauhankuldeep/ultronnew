@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
+import { DeleteEnquiryButton } from '@/components/admin/DeleteEnquiryButton';
 import { EnquiryStatusBadge } from '@/components/admin/EnquiryStatusBadge';
 import { StatCard } from '@/components/admin/StatCard';
 import { requireAdmin } from '@/lib/admin/auth';
@@ -23,7 +24,8 @@ import type { EnquiryRecord } from '@/lib/supabase/types';
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboardPage() {
-  await requireAdmin();
+  const admin = await requireAdmin();
+  const canDelete = admin.profile.role !== 'viewer';
 
   const supabase = await createClient();
 
@@ -137,42 +139,49 @@ export default async function AdminDashboardPage() {
             value={consultationMetrics.total}
             icon={Inbox}
             color="text-slate-700"
+            href="/admin/enquiries"
           />
           <StatCard
             label="New"
             value={consultationMetrics.countNew}
             icon={Clock}
             color="text-blue-600"
+            href="/admin/enquiries?status=new"
           />
           <StatCard
             label="Reviewing"
             value={consultationMetrics.countReviewing}
             icon={FileText}
             color="text-purple-600"
+            href="/admin/enquiries?status=reviewing"
           />
           <StatCard
             label="Contacted"
             value={consultationMetrics.countContacted}
             icon={Users}
             color="text-amber-600"
+            href="/admin/enquiries?status=contacted"
           />
           <StatCard
             label="Qualified"
             value={consultationMetrics.countQualified}
             icon={UserCheck}
             color="text-teal-600"
+            href="/admin/enquiries?status=qualified"
           />
           <StatCard
             label="Converted"
             value={consultationMetrics.countConverted}
             icon={CheckCircle2}
             color="text-emerald-600"
+            href="/admin/enquiries?status=converted"
           />
           <StatCard
             label="Last 7 Days"
             value={consultationMetrics.countLast7Days}
             icon={TrendingUp}
             color="text-indigo-600"
+            href="/admin/enquiries?range=7d"
           />
         </div>
 
@@ -238,12 +247,21 @@ export default async function AdminDashboardPage() {
                         })}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <Link
-                          href={`/admin/enquiries/${item.id}`}
-                          className="inline-flex items-center justify-center rounded-lg bg-[#035551]/10 px-3.5 py-1.5 text-xs font-bold whitespace-nowrap text-[#035551] uppercase transition-all hover:bg-[#035551] hover:text-white"
-                        >
-                          View Details
-                        </Link>
+                        <div className="inline-flex items-center justify-end gap-2">
+                          <Link
+                            href={`/admin/enquiries/${item.id}`}
+                            className="inline-flex items-center justify-center rounded-lg bg-[#035551]/10 px-3.5 py-1.5 text-xs font-bold whitespace-nowrap text-[#035551] uppercase transition-all hover:bg-[#035551] hover:text-white"
+                          >
+                            View Details
+                          </Link>
+                          {canDelete && (
+                            <DeleteEnquiryButton
+                              enquiryId={item.id}
+                              referenceNumber={item.reference_number}
+                              fullName={item.full_name}
+                            />
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -276,42 +294,49 @@ export default async function AdminDashboardPage() {
             value={partnerMetrics.total}
             icon={Handshake}
             color="text-amber-700"
+            href="/admin/partner-leads"
           />
           <StatCard
             label="New"
             value={partnerMetrics.countNew}
             icon={Clock}
             color="text-blue-600"
+            href="/admin/partner-leads?status=new"
           />
           <StatCard
             label="Reviewing"
             value={partnerMetrics.countReviewing}
             icon={FileText}
             color="text-purple-600"
+            href="/admin/partner-leads?status=reviewing"
           />
           <StatCard
             label="Contacted"
             value={partnerMetrics.countContacted}
             icon={Users}
             color="text-amber-600"
+            href="/admin/partner-leads?status=contacted"
           />
           <StatCard
             label="Qualified"
             value={partnerMetrics.countQualified}
             icon={UserCheck}
             color="text-teal-600"
+            href="/admin/partner-leads?status=qualified"
           />
           <StatCard
             label="Converted"
             value={partnerMetrics.countConverted}
             icon={CheckCircle2}
             color="text-emerald-600"
+            href="/admin/partner-leads?status=converted"
           />
           <StatCard
             label="Last 7 Days"
             value={partnerMetrics.countLast7Days}
             icon={TrendingUp}
             color="text-indigo-600"
+            href="/admin/partner-leads?range=7d"
           />
         </div>
 
@@ -384,12 +409,21 @@ export default async function AdminDashboardPage() {
                         })}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <Link
-                          href={`/admin/partner-leads/${item.id}`}
-                          className="inline-flex items-center justify-center rounded-lg bg-amber-600/10 px-3.5 py-1.5 text-xs font-bold whitespace-nowrap text-amber-700 uppercase transition-all hover:bg-amber-600 hover:text-white"
-                        >
-                          View Details
-                        </Link>
+                        <div className="inline-flex items-center justify-end gap-2">
+                          <Link
+                            href={`/admin/partner-leads/${item.id}`}
+                            className="inline-flex items-center justify-center rounded-lg bg-amber-600/10 px-3.5 py-1.5 text-xs font-bold whitespace-nowrap text-amber-700 uppercase transition-all hover:bg-amber-600 hover:text-white"
+                          >
+                            View Details
+                          </Link>
+                          {canDelete && (
+                            <DeleteEnquiryButton
+                              enquiryId={item.id}
+                              referenceNumber={item.reference_number}
+                              fullName={item.full_name}
+                            />
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -453,36 +487,42 @@ export default async function AdminDashboardPage() {
             value={totalBlogs}
             icon={FileText}
             color="text-slate-700"
+            href="/admin/blog"
           />
           <StatCard
             label="Published Posts"
             value={publishedBlogs}
             icon={CheckCircle2}
             color="text-emerald-600"
+            href="/admin/blog"
           />
           <StatCard
             label="Draft Posts"
             value={draftBlogs}
             icon={Clock}
             color="text-amber-600"
+            href="/admin/blog"
           />
           <StatCard
             label="Total Services"
             value={totalServices}
             icon={Layers}
             color="text-blue-600"
+            href="/admin/services"
           />
           <StatCard
             label="Published Services"
             value={publishedServices}
             icon={CheckCircle2}
             color="text-teal-600"
+            href="/admin/services"
           />
           <StatCard
             label="Visible Team"
             value={visibleTeam}
             icon={Users}
             color="text-purple-600"
+            href="/admin/team"
           />
         </div>
       </div>

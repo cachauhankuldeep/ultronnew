@@ -26,17 +26,22 @@ export async function POST(request: Request) {
 
     const supabase = await createClient();
 
-    const rpcFn = supabase.rpc as unknown as (
-      name: string,
-      args: Record<string, unknown>,
-    ) => Promise<{ data: unknown; error: unknown }>;
+    const rpcClient = supabase as unknown as {
+      rpc: (
+        name: string,
+        args: Record<string, unknown>,
+      ) => Promise<{ data: unknown; error: { message?: string } | null }>;
+    };
 
-    // Call transactional Security-Definer RPC
-    const { data, error } = await rpcFn('add_enquiry_note_with_activity', {
-      p_enquiry_id: enquiryId,
-      p_note: note.trim(),
-      p_admin_id: admin.id,
-    });
+    // Call transactional Security-Definer RPC (must stay bound to supabase instance)
+    const { data, error } = await rpcClient.rpc(
+      'add_enquiry_note_with_activity',
+      {
+        p_enquiry_id: enquiryId,
+        p_note: note.trim(),
+        p_admin_id: admin.id,
+      },
+    );
 
     if (error) throw error;
 
@@ -47,7 +52,14 @@ export async function POST(request: Request) {
     });
   } catch (error: unknown) {
     const msg =
-      error instanceof Error ? error.message : 'Failed to add internal note.';
+      error instanceof Error
+        ? error.message
+        : error &&
+            typeof error === 'object' &&
+            'message' in error &&
+            typeof (error as { message?: unknown }).message === 'string'
+          ? (error as { message: string }).message
+          : 'Failed to add internal note.';
     console.error('Admin note creation error:', error);
     return NextResponse.json({ success: false, message: msg }, { status: 500 });
   }

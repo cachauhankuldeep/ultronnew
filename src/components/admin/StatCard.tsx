@@ -1,4 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
+import Link from 'next/link';
 
 type Props = {
   label: string;
@@ -6,6 +7,7 @@ type Props = {
   icon: LucideIcon;
   color?: string;
   subtext?: string;
+  href?: string;
 };
 
 export function StatCard({
@@ -14,9 +16,10 @@ export function StatCard({
   icon: Icon,
   color = 'text-[#035551]',
   subtext,
+  href,
 }: Props) {
-  return (
-    <div className="flex h-full flex-col justify-between rounded-xl border border-slate-200 bg-white p-5 shadow-xs transition-shadow hover:shadow-md">
+  const content = (
+    <>
       <div className="flex items-center justify-between">
         <span className="text-xs font-bold tracking-wider text-slate-500 uppercase">
           {label}
@@ -34,6 +37,23 @@ export function StatCard({
         </span>
         {subtext && <p className="mt-1 text-xs text-slate-500">{subtext}</p>}
       </div>
+    </>
+  );
+
+  if (href) {
+    return (
+      <Link
+        href={href}
+        className="flex h-full cursor-pointer flex-col justify-between rounded-xl border border-slate-200 bg-white p-5 shadow-xs transition-all hover:border-[#035551]/40 hover:shadow-md focus-visible:ring-2 focus-visible:ring-[#035551] focus-visible:outline-none"
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <div className="flex h-full flex-col justify-between rounded-xl border border-slate-200 bg-white p-5 shadow-xs transition-shadow hover:shadow-md">
+      {content}
     </div>
   );
 }

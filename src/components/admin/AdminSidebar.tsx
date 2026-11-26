@@ -14,7 +14,7 @@ import {
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
-import { createClient } from '@/lib/supabase/client';
+import { signOutAdmin } from '@/lib/admin/client-auth';
 
 type Props = {
   isOpen?: boolean;
@@ -36,10 +36,7 @@ export function AdminSidebar({ isOpen, onClose }: Props) {
   const router = useRouter();
 
   const handleSignOut = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push('/admin/login');
-    router.refresh();
+    await signOutAdmin(router);
   };
 
   const navContent = (

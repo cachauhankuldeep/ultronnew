@@ -25,6 +25,7 @@ export type EnquiryFilterParams = {
   status?: string;
   service?: string;
   priority?: string;
+  range?: string;
   page?: string;
   pageSize?: number;
 };
@@ -83,6 +84,8 @@ export async function fetchFilteredEnquiries(
 
   const allRows = (rawEnquiries || []) as unknown as EnquiryRecord[];
   const searchTerm = params.q?.trim().toLowerCase() || '';
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
   const filtered = allRows.filter((item) => {
     const partner = isPartnerLead(item);
@@ -113,6 +116,13 @@ export async function fetchFilteredEnquiries(
       item.priority !== params.priority
     ) {
       return false;
+    }
+
+    if (params.range === '7d') {
+      const submittedDate = new Date(item.submitted_at || item.created_at);
+      if (submittedDate < sevenDaysAgo) {
+        return false;
+      }
     }
 
     if (searchTerm) {
@@ -159,6 +169,7 @@ export function buildEnquiryPageHref(
     status?: string;
     service?: string;
     priority?: string;
+    range?: string;
   },
 ): string {
   const search = new URLSearchParams();
@@ -167,5 +178,6 @@ export function buildEnquiryPageHref(
   if (filters.status) search.set('status', filters.status);
   if (filters.service) search.set('service', filters.service);
   if (filters.priority) search.set('priority', filters.priority);
+  if (filters.range) search.set('range', filters.range);
   return `${basePath}?${search.toString()}`;
 }

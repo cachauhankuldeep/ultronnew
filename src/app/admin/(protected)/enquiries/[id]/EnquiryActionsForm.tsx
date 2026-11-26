@@ -10,6 +10,7 @@ import {
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
+import { DeleteEnquiryButton } from '@/components/admin/DeleteEnquiryButton';
 import type {
   AdminRole,
   EnquiryPriority,
@@ -18,6 +19,9 @@ import type {
 
 type Props = {
   enquiryId: string;
+  referenceNumber: string;
+  fullName: string;
+  redirectTo: string;
   currentStatus: EnquiryStatus;
   currentPriority: EnquiryPriority;
   isArchived: boolean;
@@ -26,6 +30,9 @@ type Props = {
 
 export function EnquiryActionsForm({
   enquiryId,
+  referenceNumber,
+  fullName,
+  redirectTo,
   currentStatus,
   currentPriority,
   isArchived,
@@ -261,9 +268,9 @@ export function EnquiryActionsForm({
         </form>
       </div>
 
-      {/* Archive / Restore Action */}
+      {/* Archive / Restore & Delete Actions */}
       {!isViewer && (
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
+        <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
           <button
             type="button"
             onClick={handleToggleArchive}
@@ -271,7 +278,7 @@ export function EnquiryActionsForm({
             className={`font-display flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-xs font-bold uppercase transition-all ${
               isArchived
                 ? 'border border-teal-300 bg-teal-50 text-teal-800 hover:bg-teal-100'
-                : 'border border-red-200 bg-red-50 text-red-700 hover:bg-red-100'
+                : 'border border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100'
             }`}
           >
             {isArchiving ? (
@@ -288,6 +295,14 @@ export function EnquiryActionsForm({
               </>
             )}
           </button>
+
+          <DeleteEnquiryButton
+            enquiryId={enquiryId}
+            referenceNumber={referenceNumber}
+            fullName={fullName}
+            redirectTo={redirectTo}
+            variant="full"
+          />
         </div>
       )}
     </div>

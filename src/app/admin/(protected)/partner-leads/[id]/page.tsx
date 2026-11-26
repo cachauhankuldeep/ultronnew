@@ -368,6 +368,9 @@ export default async function PartnerLeadDetailPage({ params }: Props) {
           <div className="sticky top-8 space-y-6">
             <EnquiryActionsForm
               enquiryId={enquiry.id}
+              referenceNumber={enquiry.reference_number}
+              fullName={enquiry.full_name}
+              redirectTo="/admin/partner-leads"
               currentStatus={enquiry.status}
               currentPriority={enquiry.priority}
               isArchived={isArchived}
