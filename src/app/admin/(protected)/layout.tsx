@@ -60,6 +60,7 @@ export default function ProtectedAdminLayout({
       <AdminSidebar
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
+        userRole={adminUser.profile.role}
       />
 
       <div className="flex flex-1 flex-col overflow-hidden">

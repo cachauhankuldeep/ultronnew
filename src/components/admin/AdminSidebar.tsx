@@ -8,6 +8,7 @@ import {
   Layers,
   LogOut,
   Settings,
+  ShieldCheck,
   Users,
   X,
 } from 'lucide-react';
@@ -15,10 +16,12 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
 import { signOutAdmin } from '@/lib/admin/client-auth';
+import type { AdminRole } from '@/lib/supabase/types';
 
 type Props = {
   isOpen?: boolean;
   onClose?: () => void;
+  userRole?: AdminRole;
 };
 
 const NAV_ITEMS = [
@@ -28,10 +31,16 @@ const NAV_ITEMS = [
   { label: 'Blog Posts', href: '/admin/blog', icon: FileText },
   { label: 'Services', href: '/admin/services', icon: Layers },
   { label: 'Team Members', href: '/admin/team', icon: Users },
+  {
+    label: 'Admin Users',
+    href: '/admin/users',
+    icon: ShieldCheck,
+    adminOnly: true,
+  },
   { label: 'Website Settings', href: '/admin/settings', icon: Settings },
 ] as const;
 
-export function AdminSidebar({ isOpen, onClose }: Props) {
+export function AdminSidebar({ isOpen, onClose, userRole }: Props) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -74,7 +83,12 @@ export function AdminSidebar({ isOpen, onClose }: Props) {
           aria-label="Admin Navigation"
           className="mt-6 flex flex-col gap-1.5"
         >
-          {NAV_ITEMS.map((item) => {
+          {NAV_ITEMS.filter(
+            (item) =>
+              !('adminOnly' in item && item.adminOnly) ||
+              userRole === 'super_admin' ||
+              userRole === 'admin',
+          ).map((item) => {
             const Icon = item.icon;
             const isActive =
               item.href === '/admin'
